@@ -19,6 +19,8 @@ const {
   defesaNascidoTrouxa,
   defesaTrouxa,
   defesaSquib,
+  variacaoHp,
+  hpBase,
 } = require('../constants');
 
 function calcularAtributos(atributos) {
@@ -48,6 +50,25 @@ function calcularAtributos(atributos) {
   return { poder, magia, defesa };
 }
 
+function construirPersonagem(personagem, atributos) {
+  const { poder, magia, defesa } = calcularAtributos(atributos);
+  const hp = defesa + Math.floor(Math.random() * variacaoHp) + hpBase;
+
+  return {
+    id: personagem.id,
+    name: atributos.name,
+    house: atributos.house || 'Unknown',
+    species: atributos.species || 'Unknown',
+    ancestry: atributos.ancestry || 'Unknown',
+    image: atributos.image,
+    power: poder,
+    magic: magia,
+    defense: defesa,
+    hp,
+    maxHp: hp,
+  };
+}
+
 function embaralhar(lista) {
   const copia = [...lista];
   for (let indice = copia.length - 1; indice > 0; indice -= 1) {
@@ -59,4 +80,4 @@ function embaralhar(lista) {
   return copia;
 }
 
-module.exports = { calcularAtributos, embaralhar };
+module.exports = { calcularAtributos, construirPersonagem, embaralhar };
