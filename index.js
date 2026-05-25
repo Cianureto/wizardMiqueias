@@ -8,65 +8,65 @@ app.use(express.json());
 // pega pack de cartas aleatorias
 app.get('/api/pack', async (req, res) => {
   try {
-    const pg = Math.floor(Math.random() * 8) + 1;
-    const api = await fetch(`https://api.potterdb.com/v1/characters?page[size]=100&page[number]=${pg}`);
-    const espera = await api.json();
+    const numeroPagina = Math.floor(Math.random() * 8) + 1;
+    const resposta = await fetch(`https://api.potterdb.com/v1/characters?page[size]=100&page[number]=${numeroPagina}`);
+    const dados = await resposta.json();
 
-    const tmp = [];
-    for (let i = 0; i < espera.data.length; i += 1) {
-      const c = espera.data[i];
-      const a = c.attributes;
-      if (!a.name || a.name === '' || !a.image) continue;
+    const personagens = [];
+    for (let i = 0; i < dados.data.length; i += 1) {
+      const personagem = dados.data[i];
+      const atributos = personagem.attributes;
+      if (!atributos.name || atributos.name === '' || !atributos.image) continue;
 
-      let pw = 50;
-      if (a.house === 'Gryffindor') pw = 90;
-      if (a.house === 'Slytherin') pw = 85;
-      if (a.house === 'Hufflepuff') pw = 75;
-      if (a.house === 'Ravenclaw') pw = 80;
+      let poder = 50;
+      if (atributos.house === 'Gryffindor') poder = 90;
+      if (atributos.house === 'Slytherin') poder = 85;
+      if (atributos.house === 'Hufflepuff') poder = 75;
+      if (atributos.house === 'Ravenclaw') poder = 80;
 
-      let mg = 50;
-      if (a.species === 'human') mg = 70;
-      if (a.species === 'half-giant') mg = 88;
-      if (a.species === 'giant') mg = 95;
-      if (a.species === 'house elf') mg = 82;
-      if (a.species === 'ghost') mg = 60;
-      if (a.species === 'werewolf') mg = 91;
-      if (a.species === 'vampire') mg = 87;
-      if (a.species === 'centaur') mg = 78;
+      let magia = 50;
+      if (atributos.species === 'human') magia = 70;
+      if (atributos.species === 'half-giant') magia = 88;
+      if (atributos.species === 'giant') magia = 95;
+      if (atributos.species === 'house elf') magia = 82;
+      if (atributos.species === 'ghost') magia = 60;
+      if (atributos.species === 'werewolf') magia = 91;
+      if (atributos.species === 'vampire') magia = 87;
+      if (atributos.species === 'centaur') magia = 78;
 
-      let df = 50;
-      if (a.ancestry === 'pure-blood') df = 90;
-      if (a.ancestry === 'half-blood') df = 75;
-      if (a.ancestry === 'muggle-born') df = 70;
-      if (a.ancestry === 'muggle') df = 40;
-      if (a.ancestry === 'squib') df = 35;
+      let defesa = 50;
+      if (atributos.ancestry === 'pure-blood') defesa = 90;
+      if (atributos.ancestry === 'half-blood') defesa = 75;
+      if (atributos.ancestry === 'muggle-born') defesa = 70;
+      if (atributos.ancestry === 'muggle') defesa = 40;
+      if (atributos.ancestry === 'squib') defesa = 35;
 
-      const hp = df + Math.floor(Math.random() * 20) + 80;
+      const hp = defesa + Math.floor(Math.random() * 20) + 80;
 
-      const obj = {};
-      obj.id = c.id;
-      obj.name = a.name;
-      obj.house = a.house || 'Unknown';
-      obj.species = a.species || 'Unknown';
-      obj.ancestry = a.ancestry || 'Unknown';
-      obj.image = a.image;
-      obj.power = pw;
-      obj.magic = mg;
-      obj.defense = df;
-      obj.hp = hp;
-      obj.maxHp = hp;
+      const carta = {};
+      carta.id = personagem.id;
+      carta.name = atributos.name;
+      carta.house = atributos.house || 'Unknown';
+      carta.species = atributos.species || 'Unknown';
+      carta.ancestry = atributos.ancestry || 'Unknown';
+      carta.image = atributos.image;
+      carta.power = poder;
+      carta.magic = magia;
+      carta.defense = defesa;
+      carta.hp = hp;
+      carta.maxHp = hp;
 
-      tmp.push(obj);
+      personagens.push(carta);
     }
 
     // embaralha
-    for (let x = tmp.length - 1; x > 0; x -= 1) {
-      const randomIndex = Math.floor(Math.random() * (x + 1));
-      const temp = tmp[x]; tmp[x] = tmp[randomIndex]; tmp[randomIndex] = temp;
+    for (let indice = personagens.length - 1; indice > 0; indice -= 1) {
+      const indiceAleatorio = Math.floor(Math.random() * (indice + 1));
+      const temporario = personagens[indice]; personagens[indice] = personagens[indiceAleatorio]; personagens[indiceAleatorio] = temporario;
     }
 
     // retorna 4 cartas
-    res.json({ cards: tmp.slice(0, 4) });
+    res.json({ cards: personagens.slice(0, 4) });
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: 'erro ao buscar personagens' });
@@ -76,43 +76,43 @@ app.get('/api/pack', async (req, res) => {
 // pega feiticos disponiveis
 app.get('/api/spells', async (req, res) => {
   try {
-    const d = await fetch('https://api.potterdb.com/v1/spells?page[size]=100');
-    const r = await d.json();
+    const resposta = await fetch('https://api.potterdb.com/v1/spells?page[size]=100');
+    const dados = await resposta.json();
 
-    const tmp = [];
-    for (let i = 0; i < r.data.length; i += 1) {
-      const s = r.data[i];
-      const a = s.attributes;
-      if (!a.name || a.name === '') continue;
+    const feiticos = [];
+    for (let i = 0; i < dados.data.length; i += 1) {
+      const feitico = dados.data[i];
+      const atributos = feitico.attributes;
+      if (!atributos.name || atributos.name === '') continue;
 
-      let dmg = 30;
-      if (a.category === 'Charm') dmg = 45;
-      if (a.category === 'Curse') dmg = 90;
-      if (a.category === 'Hex') dmg = 65;
-      if (a.category === 'Jinx') dmg = 55;
-      if (a.category === 'Spell') dmg = 50;
-      if (a.category === 'Transfiguration') dmg = 40;
-      if (a.category === 'Counter-spell') dmg = 35;
-      if (a.category === 'Healing spell') dmg = -40;
+      let dano = 30;
+      if (atributos.category === 'Charm') dano = 45;
+      if (atributos.category === 'Curse') dano = 90;
+      if (atributos.category === 'Hex') dano = 65;
+      if (atributos.category === 'Jinx') dano = 55;
+      if (atributos.category === 'Spell') dano = 50;
+      if (atributos.category === 'Transfiguration') dano = 40;
+      if (atributos.category === 'Counter-spell') dano = 35;
+      if (atributos.category === 'Healing spell') dano = -40;
 
-      const obj = {};
-      obj.id = s.id;
-      obj.name = a.name;
-      obj.effect = a.effect || 'Efeito desconhecido';
-      obj.category = a.category || 'Spell';
-      obj.light = a.light || 'Unknown';
-      obj.damage = dmg;
+      const carta = {};
+      carta.id = feitico.id;
+      carta.name = atributos.name;
+      carta.effect = atributos.effect || 'Efeito desconhecido';
+      carta.category = atributos.category || 'Spell';
+      carta.light = atributos.light || 'Unknown';
+      carta.damage = dano;
 
-      tmp.push(obj);
+      feiticos.push(carta);
     }
 
     // embaralha e retorna 20
-    for (let x = tmp.length - 1; x > 0; x -= 1) {
-      const y = Math.floor(Math.random() * (x + 1));
-      const z = tmp[x]; tmp[x] = tmp[y]; tmp[y] = z;
+    for (let indice = feiticos.length - 1; indice > 0; indice -= 1) {
+      const indiceAleatorio = Math.floor(Math.random() * (indice + 1));
+      const temporario = feiticos[indice]; feiticos[indice] = feiticos[indiceAleatorio]; feiticos[indiceAleatorio] = temporario;
     }
 
-    res.json({ spells: tmp.slice(0, 20) });
+    res.json({ spells: feiticos.slice(0, 20) });
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: 'erro ao buscar feiticos' });
@@ -122,63 +122,63 @@ app.get('/api/spells', async (req, res) => {
 // monta deck cpu com personagens aleatorios
 app.post('/api/cpu-deck', async (req, res) => {
   try {
-    const pg = Math.floor(Math.random() * 8) + 1;
-    const d = await fetch(`https://api.potterdb.com/v1/characters?page[size]=100&page[number]=${pg}`);
-    const r = await d.json();
+    const numeroPagina = Math.floor(Math.random() * 8) + 1;
+    const resposta = await fetch(`https://api.potterdb.com/v1/characters?page[size]=100&page[number]=${numeroPagina}`);
+    const dados = await resposta.json();
 
-    const tmp = [];
-    for (let i = 0; i < r.data.length; i += 1) {
-      const c = r.data[i];
-      const a = c.attributes;
-      if (!a.name || a.name === '' || !a.image) continue;
+    const personagens = [];
+    for (let i = 0; i < dados.data.length; i += 1) {
+      const personagem = dados.data[i];
+      const atributos = personagem.attributes;
+      if (!atributos.name || atributos.name === '' || !atributos.image) continue;
 
-      let pw = 50;
-      if (a.house === 'Gryffindor') pw = 90;
-      if (a.house === 'Slytherin') pw = 85;
-      if (a.house === 'Hufflepuff') pw = 75;
-      if (a.house === 'Ravenclaw') pw = 80;
+      let poder = 50;
+      if (atributos.house === 'Gryffindor') poder = 90;
+      if (atributos.house === 'Slytherin') poder = 85;
+      if (atributos.house === 'Hufflepuff') poder = 75;
+      if (atributos.house === 'Ravenclaw') poder = 80;
 
-      let mg = 50;
-      if (a.species === 'human') mg = 70;
-      if (a.species === 'half-giant') mg = 88;
-      if (a.species === 'giant') mg = 95;
-      if (a.species === 'house elf') mg = 82;
-      if (a.species === 'ghost') mg = 60;
-      if (a.species === 'werewolf') mg = 91;
-      if (a.species === 'vampire') mg = 87;
-      if (a.species === 'centaur') mg = 78;
+      let magia = 50;
+      if (atributos.species === 'human') magia = 70;
+      if (atributos.species === 'half-giant') magia = 88;
+      if (atributos.species === 'giant') magia = 95;
+      if (atributos.species === 'house elf') magia = 82;
+      if (atributos.species === 'ghost') magia = 60;
+      if (atributos.species === 'werewolf') magia = 91;
+      if (atributos.species === 'vampire') magia = 87;
+      if (atributos.species === 'centaur') magia = 78;
 
-      let df = 50;
-      if (a.ancestry === 'pure-blood') df = 90;
-      if (a.ancestry === 'half-blood') df = 75;
-      if (a.ancestry === 'muggle-born') df = 70;
-      if (a.ancestry === 'muggle') df = 40;
-      if (a.ancestry === 'squib') df = 35;
+      let defesa = 50;
+      if (atributos.ancestry === 'pure-blood') defesa = 90;
+      if (atributos.ancestry === 'half-blood') defesa = 75;
+      if (atributos.ancestry === 'muggle-born') defesa = 70;
+      if (atributos.ancestry === 'muggle') defesa = 40;
+      if (atributos.ancestry === 'squib') defesa = 35;
 
-      const hp = df + Math.floor(Math.random() * 20) + 80;
+      const hp = defesa + Math.floor(Math.random() * 20) + 80;
 
-      const obj = {};
-      obj.id = c.id;
-      obj.name = a.name;
-      obj.house = a.house || 'Unknown';
-      obj.species = a.species || 'Unknown';
-      obj.ancestry = a.ancestry || 'Unknown';
-      obj.image = a.image;
-      obj.power = pw;
-      obj.magic = mg;
-      obj.defense = df;
-      obj.hp = hp;
-      obj.maxHp = hp;
+      const carta = {};
+      carta.id = personagem.id;
+      carta.name = atributos.name;
+      carta.house = atributos.house || 'Unknown';
+      carta.species = atributos.species || 'Unknown';
+      carta.ancestry = atributos.ancestry || 'Unknown';
+      carta.image = atributos.image;
+      carta.power = poder;
+      carta.magic = magia;
+      carta.defense = defesa;
+      carta.hp = hp;
+      carta.maxHp = hp;
 
-      tmp.push(obj);
+      personagens.push(carta);
     }
 
-    for (let x = tmp.length - 1; x > 0; x -= 1) {
-      const y = Math.floor(Math.random() * (x + 1));
-      const z = tmp[x]; tmp[x] = tmp[y]; tmp[y] = z;
+    for (let indice = personagens.length - 1; indice > 0; indice -= 1) {
+      const indiceAleatorio = Math.floor(Math.random() * (indice + 1));
+      const temporario = personagens[indice]; personagens[indice] = personagens[indiceAleatorio]; personagens[indiceAleatorio] = temporario;
     }
 
-    res.json({ deck: tmp.slice(0, 2) });
+    res.json({ deck: personagens.slice(0, 2) });
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: 'erro ao montar deck cpu' });
